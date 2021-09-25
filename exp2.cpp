@@ -116,7 +116,7 @@ double Brese[11];
         }
         glEnd();
     }
-    void displaySG()
+    void display1()
     {
 
         glClear(GL_COLOR_BUFFER_BIT); 
@@ -154,12 +154,12 @@ double Brese[11];
                 beginDDA=clock();
                 lineDDA(x0,x1,y0,y1);
                 endDDA=clock();
-                time0+=(double)(endDDA-beginDDA);
+                time0+=(double)(endDDA-beginDDA)/CLOCKS_PER_SEC;
 
                 beginBrese=clock();
                 lineBrese(x0,x1,y0,y1);
                 endBrese=clock();
-                time1+=(double)(endBrese-beginBrese);
+                time1+=(double)(endBrese-beginBrese)/CLOCKS_PER_SEC;
             }
             DDA[i]=time0;Brese[i]=time1;
             cout<<"timeDDA: "<<time0<<endl;
@@ -171,6 +171,35 @@ double Brese[11];
         
         glFlush();
     }
+    double timeTran[6]={0.0};
+    void display2(){
+        int count=10000;
+        time_t begin,end;
+        int x0=0,x1=10,y0=0,y1=rand()%10;
+        for (size_t i = 0; i < count; i++)
+        {   
+            begin=clock();
+            lineDDA(x0,x1,y0,y1);
+            end=clock();
+            timeTran[0]+=(double)(end-begin)/CLOCKS_PER_SEC;
+        }
+        int k =1;
+        for (size_t i = 1; i <=9; i+=2)
+        {
+            srand(786);
+            x1 = i*100;
+            for (size_t j = 0; j < count; j++)
+            {
+                y1=rand()%x1;
+                begin=clock();
+                lineDDA(x0,x1,y0,y1);
+                end=clock();
+                timeTran[k]+=(double)(end-begin)/CLOCKS_PER_SEC;
+            }
+            cout<<timeTran[k++]<<",";
+        }
+        glFlush(); 
+    }
     int  main(int argc, char **argv)
     {   
 
@@ -179,7 +208,7 @@ double Brese[11];
         glutInitWindowSize(500,500);
         glutInitWindowPosition(50,50);
         glutCreateWindow("Sierpinski Gasket");
-        glutDisplayFunc(displaySG);
+        glutDisplayFunc(display2);
         myinit();
         glutMainLoop();
         return 0;
