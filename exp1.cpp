@@ -12,7 +12,7 @@ using namespace std;
         // set up viewing
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluOrtho2D(0.0, 50.0,0.0,50.0);
+        gluOrtho2D(0.0, 500.0,0.0,500.0);
         glMatrixMode(GL_MODELVIEW);
     }
 
@@ -31,7 +31,7 @@ using namespace std;
         GLfloat p[3] = {7.5, 5.0, 0.0};
                     // or set any desired initial point which is inside the triangle;
         int  j,k;
-        int total_points = 50000;
+        int total_points = 150000;
         glBegin(GL_POINTS);
         for (k = 0; k < total_points; k++)
         {
