@@ -132,12 +132,12 @@ double Brese[11];
             beginDDA=clock();
             lineDDA(x0,x1,y0,y1);
             endDDA=clock();
-            time0+=(double)(endDDA-beginDDA);
+            time0+=(double)(endDDA-beginDDA)/CLOCKS_PER_SEC;
 
             beginBrese=clock();
             lineBrese(x0,x1,y0,y1);
             endBrese=clock();
-            time1+=(double)(endBrese-beginBrese);
+            time1+=(double)(endBrese-beginBrese)/CLOCKS_PER_SEC;
         }
         DDA[0]=time0;Brese[0]=time1;
         glClear(GL_COLOR_BUFFER_BIT);
@@ -174,6 +174,7 @@ double Brese[11];
         {
             cout<<Brese[i]<<",";
         }
+        cout<<endl;
         glFlush();
     }
 
@@ -230,7 +231,7 @@ double Brese[11];
         glutInitWindowSize(500,500);
         glutInitWindowPosition(50,50);
         glutCreateWindow("Sierpinski Gasket");
-        glutDisplayFunc(display3);
+        glutDisplayFunc(display2);
         myinit();
         glutMainLoop();
         return 0;
