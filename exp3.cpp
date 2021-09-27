@@ -101,6 +101,13 @@ void displaySG()
 
     glEnd();
     erase();
+    glBegin(GL_LINES);
+    glVertex2i(20, 1);
+    glVertex2i(40, 1);
+
+    glVertex2i(300, 1);
+    glVertex2i(320, 1);
+    glEnd();
     glFlush();
 }
 int main(int argc, char** argv)
