@@ -42,18 +42,10 @@ void erase()
     int x0 = rand() % 5;
     int y0 = rand() % 6;
     Number(x0, y0);
-    for (size_t i = 0; i < 5; i++) {
-        for (size_t j = 0; j < 6; j++) {
-            cout << seq[i][j] << " ";
-        }
-        cout << endl;
-    }
-
     glColor3f(0.0f, 0.0f, 0.0f);
     for (size_t i = 0; i < 5; i++) {
         for (size_t j = 0; j < 5; j++) {
             if (abs(seq[i][j] - seq[i][j + 1]) == 1) {
-                cout << "draw:" << i << " , " << j << endl;
                 glBegin(GL_LINES);
                 glVertex2i((i + 1) * 70 + 1, j * 70 + 1);
                 glVertex2i((i + 1) * 70 + 1, (j + 1) * 70 + 1);
@@ -64,7 +56,6 @@ void erase()
     for (size_t i = 0; i < 6; i++) {
         for (size_t j = 0; j < 4; j++) {
             if (abs(seq[j][i] - seq[j + 1][i]) == 1) {
-                cout << "draw:" << i << " , " << j << endl;
                 glBegin(GL_LINES);
                 glVertex2i(i * 70 + 1, (j + 1) * 70 + 1);
                 glVertex2i((i + 1) * 70 + 1, (j + 1) * 70 + 1);
