@@ -5,182 +5,176 @@
 #include <string.h>
 using namespace std;
 
-// void setLightRes()
-// {
-//     GLfloat lightPosition[] = { 0.0f, 0.0f, 1.0f, 0.0f };
-//     glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-//     glEnable(GL_LIGHTING); //启用光源
-//     glEnable(GL_LIGHT0); //使用指定灯光
-// }
-bool mouseDown = false;
-
-float xrot = 0.0f;
-float yrot = 0.0f;
-
-float xdiff = 0.0f;
-float ydiff = 0.0f;
+string chair = "/home/zzx/code/CG/CG-Experiment/chairs/2f1bc92c53f359d759a6208793b9dfca/models/model_normalized.obj";
+string table = "/home/zzx/code/CG/CG-Experiment/tables/1a767b8130e8a5722a7d46e74f08da70/models/model_normalized.obj";
+loader C(chair);
+loader T(table);
 void myinit()
 {
-
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_shininess[] = { 50.0 };
-    GLfloat light_position[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat white_light[] = { 0.0, 1.0, 1.0, 1.0 };
-    GLfloat lmodel_ambient[] = { 0.1, 0.1, 0.1, 1.0 };
-    glClearColor(1.0, 1.0, 1.0, 0.0);
-    glShadeModel(GL_SMOOTH);
-    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, white_light);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, white_light);
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
-
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
+    glClearColor(0, 0, 0, 0);
+    glEnable(GL_NORMALIZE);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_TEXTURE_2D);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60.0, 800 / 600, 1.0, 21.0);
+    // void gluPerspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFa)
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(6, 7, 8, 0, 0, 0, 0, 1, 0);
 }
-bool loadOBJ(
-    const char* path,
-    std::vector<glm::vec3>& out_vertices,
-    std::vector<glm::vec2>& out_uvs,
-    std::vector<glm::vec3>& out_normals)
+void room()
 {
-    printf("Loading OBJ file %s...\n", path);
+    glColor3f(1, 0, 0);
+    glBegin(GL_LINES);
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(-0.5, 0.5, 0.5);
 
-    std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
-    std::vector<glm::vec3> temp_vertices;
-    std::vector<glm::vec2> temp_uvs;
-    std::vector<glm::vec3> temp_normals;
+    glVertex3f(-0.5, 0.5, 0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
 
-    FILE* file = fopen(path, "r");
-    if (file == NULL) {
-        printf("Impossible to open the file ! Are you in the right path ? See Tutorial 1 for details\n");
-        return false;
-    }
+    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-0.5, -0.5, -0.5);
 
-    while (1) {
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(-0.5, -0.5, 0.5);
 
-        char lineHeader[128];
-        // read the first word of the line
-        int res = fscanf(file, "%s", lineHeader);
-        if (res == EOF)
-            break; // EOF = End Of File. Quit the loop.
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, 0.5);
 
-        // else : parse lineHeader
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
 
-        if (strcmp(lineHeader, "v") == 0) {
-            cout << "Get v" << endl;
-            glm::vec3 vertex;
-            fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-            temp_vertices.push_back(vertex);
-        } else if (strcmp(lineHeader, "vt") == 0) {
-            cout << "Get vt" << endl;
-            glm::vec2 uv;
-            fscanf(file, "%f %f\n", &uv.x, &uv.y);
-            uv.y = -uv.y; // Invert V coordinate since we will only use DDS texture, which are inverted. Remove if you want to use TGA or BMP loaders.
-            temp_uvs.push_back(uv);
-        } else if (strcmp(lineHeader, "vn") == 0) {
-            cout << "Get vn" << endl;
-            glm::vec3 normal;
-            fscanf(file, "%f %f %f\n", &normal.x, &normal.y, &normal.z);
-            temp_normals.push_back(normal);
-        } else if (strcmp(lineHeader, "f") == 0) {
-            cout << "Get f" << endl;
-            std::string vertex1, vertex2, vertex3;
-            unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-            int matches = fscanf(file, "%d//%d %d//%d %d//%d\n", &vertexIndex[0], &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
-            if (matches != 6) {
-                printf("File can't be read by our simple parser :-( Try exporting with other options\n");
-                return false;
-            }
-            vertexIndices.push_back(vertexIndex[0]);
-            vertexIndices.push_back(vertexIndex[1]);
-            vertexIndices.push_back(vertexIndex[2]);
-            normalIndices.push_back(normalIndex[0]);
-            normalIndices.push_back(normalIndex[1]);
-            normalIndices.push_back(normalIndex[2]);
-        } else {
-            // Probably a comment, eat up the rest of the line
-            char stupidBuffer[1000];
-            fgets(stupidBuffer, 1000, file);
-        }
-    }
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(-0.5, 0.5, 0.5);
 
-    // For each vertex of each triangle
-    for (unsigned int i = 0; i < vertexIndices.size(); i++) {
+    glVertex3f(-0.5, 0.5, 0.5);
+    glVertex3f(-0.5, -0.5, 0.5);
 
-        // Get the indices of its attributes
-        unsigned int vertexIndex = vertexIndices[i];
-        unsigned int normalIndex = normalIndices[i];
+    // 3
+    glVertex3f(-0.5, -0.5, -.5);
+    glVertex3f(0.5, -0.5, -0.5);
 
-        // Get the attributes thanks to the index
-        glm::vec3 vertex = temp_vertices[vertexIndex - 1];
-        glm::vec3 normal = temp_normals[normalIndex - 1];
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(0.5, 0.5, -0.5);
 
-        // Put the attributes in buffers
-        out_vertices.push_back(vertex);
-        out_normals.push_back(normal);
-    }
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
 
-    return true;
-}
-void mouse(int button, int state, int x, int y)
-{
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        mouseDown = true;
-        xdiff = x - yrot;
-        ydiff = -y + xrot;
-        std::cout << "xdiff:" << xdiff << "\tydiff" << ydiff << std::endl;
-    } else
-        mouseDown = false;
+    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-0.5, -0.5, -.5);
+    // 4
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+    // 5
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(-0.5, -0.5, -0.5);
+
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+    glEnd();
 }
 
-// 鼠标移动事件
-void mouseMotion(int x, int y)
-{
-    if (mouseDown) {
-        yrot = x - xdiff;
-        xrot = y + ydiff;
-        std::cout << "yrot:" << yrot << "\txrot" << xrot << std::endl;
-
-        glutPostRedisplay();
-    }
-}
-vector<glm::vec3> vertices;
-vector<glm::vec2> uvs;
-vector<glm::vec3> normals;
 void display()
 {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    glRotatef(xrot, 1.0f, 0.0f, 0.0f);
-    glRotatef(yrot, 0.0f, 1.0f, 0.0f);
-    glBegin(GL_TRIANGLES);
-    for (auto ver : vertices) {
-        glVertex3f(ver.x, ver.y, ver.z);
-    }
-    for (auto nor : normals) {
-        glNormal3f(nor.x, nor.y, nor.z);
-    }
 
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(0, -0.4, -1.0);
+    glRotatef(180, 0, 1, 0);
+    C.draw();
+    glPopMatrix();
+
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(1.0, -0.4, -0.6);
+    glRotatef(90, 0, 1, 0);
+    C.draw();
+    glPopMatrix();
+
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(1.0, -0.4, 0.6);
+    glRotatef(90, 0, 1, 0);
+    C.draw();
+    glPopMatrix();
+
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(-1.0, -0.4, -0.6);
+    glRotatef(-90, 0, 1, 0);
+    C.draw();
+    glPopMatrix();
+
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(-1.0, -0.4, 0.6);
+    glRotatef(-90, 0, 1, 0);
+    C.draw();
+    glPopMatrix();
+
+    glColor3f(0, 1, 0);
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(0.0, -0.4, 1.0);
+    C.draw();
+    glPopMatrix();
+
+    glPushMatrix();
+    glScalef(3, 3, 3);
+    glTranslatef(0, -0.4, 0.0);
+    T.draw();
+    glPopMatrix();
+
+    glPushMatrix();
+    glScalef(8, 8, 8);
+    glTranslatef(0, 0.2, 0);
+    room();
+    glPopMatrix();
+
+    glEnable(GL_NORMALIZE);
+    glColor3f(1, 1, 1);
+
+    glMatrixMode(GL_MODELVIEW);
     glEnd();
     glFlush();
-    glutSwapBuffers();
 }
+vector<glm::vec3> c_vertices;
+vector<glm::vec2> c_uvs;
+vector<glm::vec3> c_normals;
 int main(int argc, char** argv)
 {
-    bool res = loadOBJ("/home/zzx/code/CG/CG-Experiment/tables/1a8fe5baa2d4b5f7ee84261b3d20656/models/model_normalized.obj", vertices, uvs, normals);
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
-    glutInitWindowSize(500, 500);
+    glutInitWindowSize(800, 600);
     glutInitWindowPosition(50, 50);
-    glutCreateWindow("Flag");
+    glutCreateWindow("Room");
     myinit();
     glutDisplayFunc(display);
-    glutMouseFunc(mouse);
-    glutMotionFunc(mouseMotion);
     glutMainLoop();
 
     return 0;
