@@ -18,16 +18,17 @@ private:
     struct n_vertex {
         int v_index;
         int t_index = -1;
-        int n_index = 1;
+        int n_index = -1;
     };
     vector<vector<n_vertex>> faces;
 
 public:
-    loader(string);
+    explicit loader(string);
+    loader();
     ~loader();
     void draw();
 };
-
+loader::loader() {};
 loader::loader(string filename)
 {
     string line;
@@ -64,22 +65,28 @@ loader::loader(string filename)
             vector<n_vertex> face;
             while (s >> index) {
                 n_vertex temp;
-                replace(index.begin(), index.end(), '/', ' ');
-                cout << index << endl;
-                istringstream index_stream(index);
-                if (index.find("  ") != string::npos) {
-                    index_stream >> temp.v_index
-                        >> temp.n_index;
-                    temp.v_index--;
-                    temp.n_index--;
-                } else {
-                    index_stream >> temp.v_index
-                        >> temp.t_index
-                        >> temp.n_index;
+                if (index.find("/") != string::npos) {
+                    replace(index.begin(), index.end(), '/', ' ');
+                    cout << index << endl;
+                    istringstream index_stream(index);
+                    if (index.find("  ") != string::npos) {
+                        index_stream >> temp.v_index
+                            >> temp.n_index;
+                        temp.v_index--;
+                        temp.n_index--;
+                    } else {
+                        index_stream >> temp.v_index
+                            >> temp.t_index
+                            >> temp.n_index;
 
+                        temp.v_index--;
+                        temp.t_index--;
+                        temp.n_index--;
+                    }
+                } else {
+                    istringstream index_stream(index);
+                    index_stream >> temp.v_index;
                     temp.v_index--;
-                    temp.t_index--;
-                    temp.n_index--;
                 }
                 face.push_back(temp);
             }
@@ -96,6 +103,7 @@ loader::~loader()
 
 void loader::draw()
 {
+
     if (text.size() > 0) {
         for (size_t i = 0; i < faces.size(); i++) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -113,10 +121,9 @@ void loader::draw()
             }
             glEnd();
         }
-    } else {
+    } else if (normals.size() > 0) {
         for (size_t i = 0; i < faces.size(); i++) {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            cout << "begin" << endl;
             glBegin(GL_TRIANGLES);
             for (size_t j = 0; j < 3; j++) {
                 int n_idx = faces[i][j].n_index;
@@ -126,6 +133,15 @@ void loader::draw()
             }
             glEnd();
         }
+    } else {
+        for (size_t i = 0; i < faces.size(); i++) {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glBegin(GL_TRIANGLES);
+            for (size_t j = 0; j < 3; j++) {
+                int v_idx = faces[i][j].v_index;
+                glVertex3f(vertex[v_idx].x, vertex[v_idx].y, vertex[v_idx].z);
+            }
+            glEnd();
+        }
     }
-    cout << "draw end" << endl;
 }
