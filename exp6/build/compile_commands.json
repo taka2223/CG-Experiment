@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/zzx/code/CG/CG-Experiment/exp6/build",
+  "command": "/bin/x86_64-linux-gnu-gcc-9   -g   -o CMakeFiles/exp6.dir/src/glad.c.o   -c /home/zzx/code/CG/CG-Experiment/exp6/src/glad.c",
+  "file": "/home/zzx/code/CG/CG-Experiment/exp6/src/glad.c"
+},
+{
+  "directory": "/home/zzx/code/CG/CG-Experiment/exp6/build",
+  "command": "/bin/x86_64-linux-gnu-g++-9    -g   -o CMakeFiles/exp6.dir/src/main.cpp.o -c /home/zzx/code/CG/CG-Experiment/exp6/src/main.cpp",
+  "file": "/home/zzx/code/CG/CG-Experiment/exp6/src/main.cpp"
+}
+]

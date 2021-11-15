@@ -1,0 +1,1 @@
+/bin/x86_64-linux-gnu-g++-9  -g  -rdynamic CMakeFiles/exp6.dir/src/glad.c.o CMakeFiles/exp6.dir/src/main.cpp.o  -o exp6  -lglfw3 -lGL -lGL -lm -ldl -lXinerama -lXrandr -lXi -lXcursor -lX11 -lXxf86vm -lpthread -lassimp 
