@@ -47,26 +47,29 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    // glfwMakeContextCurrent(window);
+    // glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glEnable(GL_DEPTH_TEST);
+    // glEnable(GL_CULL_FACE);
     // vertex shader
 
     program pro("../glsl/vertex.vs", "../glsl/fragment.fs");
-
+    // program pro("../glsl/vertex_onelight.vs", "../glsl/fragment_onelight.fs");
     // program pro("../glsl/gouraud_v.vs", "../glsl/gouraud_f.fs");
     string horse_suffix = "../resource/modelSequence/horses/horses_";
+    string cactus_suffix = "../resource/modelSequence/cactus/cactus_";
     string postfix = ".obj";
-    // vector<Model> models;
-    // for (size_t i = 0; i < 117; i++)
-    // {
-        // string path = horse_suffix+to_string(0)+postfix;
-        // Model model1(path);
-    //     models.push_back(model1);
-    // }
+    vector<Model> models;
+    for (size_t i = 0; i < 120; i++)
+    {
+        string path = cactus_suffix+to_string(i)+postfix;
+        // string path = horse_suffix+to_string(i)+postfix;
+        Model model1(path);
+        models.push_back(model1);
+    }
     
-    Model model1("../resource/modelSequence/horses/horses_0.obj");
+    Model model1("../resource/modelSequence/cactus/cactus_0.obj");
 
     float vertices[]={
                 // positions        // texture coords
@@ -115,7 +118,7 @@ int main()
     int width, height, nrChannels;
     // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
     stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load("../resource/图片22.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../resource/图片11.jpg", &width, &height, &nrChannels, 0);
     if (data)
     {
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -131,6 +134,55 @@ int main()
     glfwSwapInterval(1);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3(0.7f, 0.2f, 2.0f),
+        glm::vec3(1.3f, -2.3f, -2.0f),
+        glm::vec3(-2.0f, 1.0f, -1.50f),
+        glm::vec3(0.0f, 0.0f, -3.0f)
+    };
+
+    pro.use();
+    pro.setInt("material.diffuse", 0.5);
+    pro.setInt("material.specular", 1);
+    pro.setFloat("material.shininess", 32.0f);
+    pro.setVec3("viewPos", camera.Position);
+    // pro.setVec3("lightColor",0.0f,1.0f,1.0f);
+    // pro.setVec3("lightPos",1.5f,1.0f,0.0f);
+
+    // point light 1
+    pro.setVec3("pointLights[0].position", pointLightPositions[0]);
+    pro.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    pro.setVec3("pointLights[0].diffuse", 0.7f, 0.8f, 0.9f);
+    pro.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    pro.setFloat("pointLights[0].constant", 1.0f);
+    pro.setFloat("pointLights[0].linear", 0.09);
+    pro.setFloat("pointLights[0].quadratic", 0.032);
+    // point light 2
+    pro.setVec3("pointLights[1].position", pointLightPositions[1]);
+    pro.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    pro.setVec3("pointLights[1].diffuse", 0.5f, 0.6f, 0.7f);
+    pro.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    pro.setFloat("pointLights[1].constant", 1.0f);
+    pro.setFloat("pointLights[1].linear", 0.09);
+    pro.setFloat("pointLights[1].quadratic", 0.032);
+    // point light 3
+    pro.setVec3("pointLights[2].position", pointLightPositions[2]);
+    pro.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    pro.setVec3("pointLights[2].diffuse", 1.0f, 0.8f, 0.8f);
+    pro.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    pro.setFloat("pointLights[2].constant", 1.0f);
+    pro.setFloat("pointLights[2].linear", 0.09);
+    pro.setFloat("pointLights[2].quadratic", 0.032);
+    // point light 4
+    pro.setVec3("pointLights[3].position", pointLightPositions[3]);
+    pro.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    pro.setVec3("pointLights[3].diffuse", 0.0f, 0.8f, 1.0f);
+    pro.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    pro.setFloat("pointLights[3].constant", 1.0f);
+    pro.setFloat("pointLights[3].linear", 0.09);
+    pro.setFloat("pointLights[3].quadratic", 0.032);
+
     while (!glfwWindowShouldClose(window)) {
 
         float currentFrame = glfwGetTime();
@@ -139,44 +191,34 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture);
         processInput(window);
         // render container
-        pro.use();
-        pro.setVec3("lightColor",0.0f, 1.0f, 1.0f);
-        pro.setVec3("lightPos",lightPos);
-        pro.setVec3("viewPos",camera.Position);
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
-        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
-        model = glm::rotate(model,-45.0f,glm::vec3(1.0f,0.0f,0.0f));
-        pro.setMat4("model", model);
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         // view/projection transformations
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
         pro.setMat4("projection", projection);
         pro.setMat4("view", view);
+        glm::mat4 model = glm::mat4(1.0f);
 
-        // for (size_t i = 0; i < models.size(); i++)
-        // {
+        for (size_t i = 0; i < models.size(); i++)
+        {
             model = glm::mat4(1.0f);
             model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // translate it down so it's at the center of the scene
             model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f)); // it's a bit too big for our scene, so scale it down
-            model = glm::rotate(model, -45.0f, glm::vec3(1.0f, 0.0f, 0.0f));
             pro.setMat4("model", model);
             glBindVertexArray(VAO);
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
             // render the loaded model
             model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.0f, -0.1f, 0.3f)); // translate it down so it's at the center of the scene
+            model = glm::translate(model, glm::vec3(0.0f, -0.05f, 0.3f)); // translate it down so it's at the center of the scene
             model = glm::scale(model, glm::vec3(0.8f, 0.8f, 0.8f)); // it's a bit too big for our scene, so scale it down
             model = glm::rotate(model, -50.0f, glm::vec3(0.0f, 1.0f, 0.0f));
             pro.setMat4("model", model);
-            model1.Draw(pro);
+            models[i].Draw(pro);
+            // model1.Draw(pro);
             glfwSwapBuffers(window);
             usleep(100000);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // }
+        }
 
         // glfwSwapBuffers(window);
         glfwPollEvents();
