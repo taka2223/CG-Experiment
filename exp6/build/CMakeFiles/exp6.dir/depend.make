@@ -3,6 +3,9 @@
 
 CMakeFiles/exp6.dir/src/glad.c.o: ../src/glad.c
 
+CMakeFiles/exp6.dir/src/main.cpp.o: ../src/Mesh.h
+CMakeFiles/exp6.dir/src/main.cpp.o: ../src/Model.h
+CMakeFiles/exp6.dir/src/main.cpp.o: ../src/camera.h
 CMakeFiles/exp6.dir/src/main.cpp.o: ../src/main.cpp
 CMakeFiles/exp6.dir/src/main.cpp.o: ../src/program.h
 CMakeFiles/exp6.dir/src/main.cpp.o: ../src/shader.h

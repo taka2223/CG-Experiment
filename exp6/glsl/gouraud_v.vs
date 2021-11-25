@@ -1,18 +1,24 @@
 #version 330 core
-out vec4 FragColor;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec2 aTexCoords;
 
-in vec3 Normal;
-in vec3 FragPos;
-in vec2 TexCoords;
-
-
+varying vec4 FragColor;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 uniform vec3 viewPos;
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform sampler2D texture_diffuse1;
 
 void main()
-{    
+{
+    vec3 Normal = mat3(transpose(inverse(model))) * aNormal;
+    vec2 TexCoords = aTexCoords;    
+    vec3 FragPos = vec3(model * vec4(aPos, 1.0));
+    gl_Position = projection * view * model * vec4(aPos, 1.0);
+
     float specularStrength = 0.5;
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPos-FragPos);
